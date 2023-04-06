@@ -1,5 +1,6 @@
 using LaptopShop.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<LaptopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+//add auth service
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+ {
+	 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+	 {
+		 ValidateIssuerSigningKey = true,
+		 ValidateAudience = false,
+		 ValidateIssuer = false,
+		 IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+				 builder.Configuration.GetSection("JWT:Key").Value!))
+	 };
+ });
+
+
 
 var app = builder.Build();
 
